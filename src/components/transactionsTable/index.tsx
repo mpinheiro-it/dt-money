@@ -1,13 +1,8 @@
-import { useEffect } from "react";
-import { api } from "../../services/api";
+import { useTransactions } from "../../hooks/useTransactions";
 import { Container } from "./style";
 
 export function TransactionsTable() {
-
-    useEffect(() => {
-        api.get('transactions')        
-        .then(response => console.log(response.data))
-    }, []);
+    const { transactions } = useTransactions();   
 
     return(
 
@@ -24,26 +19,28 @@ export function TransactionsTable() {
             </thead>
             
             <tbody>
-                <tr>
-                    <td>Desenvolvimento de Website</td>
-                    <td className="deposit">R$12.000</td>
-                    <td>Desenvolvimento</td>
-                    <td>20/02/2021</td>
-                </tr>
+            
+            {transactions.map(transaction => {
+                return (
+                    //toda vez q fizer um map o primeiro elemento precisa de uma key
+                    <tr key={transaction.id}>
+                        <td>{transaction.title}</td>
+                        <td className={transaction.type}>
+                           {new Intl.NumberFormat('pt-BR', {
+                                style: 'currency',
+                                currency: 'BRL'
+                           }).format(transaction.amount)}
+                        </td>
+                        <td>{transaction.category}</td>
+                        <td>
+                        {new Intl.DateTimeFormat('pt-BR')
+                            //convertendo string em date para poder converter
+                            .format(new Date(transaction.createdAt))}
+                        </td>
+                    </tr>
+                )
+            })}
 
-                <tr>
-                    <td>Aluguel</td>
-                    <td className="withdraw">R$1.100</td>
-                    <td>Casa</td>
-                    <td>01/02/2021</td>
-                </tr>
-
-                <tr>
-                    <td>Conta de Luz</td>
-                    <td className="withdraw">R$200</td>
-                    <td>Despesas</td>
-                    <td>30/02/2021</td>
-                </tr>
             </tbody>
 
             </table>
